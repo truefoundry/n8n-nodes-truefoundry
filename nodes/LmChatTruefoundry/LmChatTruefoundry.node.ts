@@ -38,16 +38,9 @@ export interface TruefoundryMetadata {
     execution_id: string;
     execution_mode: string;
     project_id: string;
-    instance_id: string;
     environment: string;
-    workflow_active: string;
-    feature: string;
-    request_time: string;
-    tfy_log_request: string;
-    department?: string;
+    n8n_app_name: string;
     cost_center?: string;
-    fallback_user_email?: string;
-    source: string;
 }
 
 export function getTruefoundryMetadata(
@@ -70,8 +63,6 @@ export function getTruefoundryMetadata(
     const workflowName = workflow.name || 'unknown-workflow-name';
     const executionId = node.getExecutionId() || 'unknown-execution';
     const executionMode = node.getMode();
-    const instanceId = node.getInstanceId();
-    const workflowActive = workflow.active ? 'true' : 'false';
 
     // 4. Attribution Settings
     const department = attributionSettings.department || '';
@@ -88,23 +79,22 @@ export function getTruefoundryMetadata(
         execution_id: String(executionId),
         execution_mode: executionMode,
         project_id: String(projectId),
-        instance_id: instanceId,
         environment: environment,
-        workflow_active: workflowActive,
-        feature: applicationName || 'n8n-ai-agent',
-        request_time: new Date().toISOString(),
-        tfy_log_request: 'true',
-        source: 'n8n',
+        n8n_app_name: applicationName || 'n8n-ai-agent',
     };
 
-    if (department) metadata.department = department;
-    if (costCenter) metadata.cost_center = costCenter;
-    if (fallbackUserEmail) metadata.fallback_user_email = fallbackUserEmail;
+    if (department && costCenter) {
+        metadata.cost_center = `${costCenter}, ${department}`;
+    } else if (costCenter) {
+        metadata.cost_center = costCenter;
+    } else if (department) {
+        metadata.cost_center = department;
+    }
 
     return metadata;
 }
 
-function createGuardrailAwareFetch(tfyMetadata: TruefoundryMetadata): typeof fetch {
+function createTfyFetch(tfyMetadata: TruefoundryMetadata): typeof fetch {
     return async(input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
 
         // Truefoundry logic: inject metadata headers, a failsafe in case langchain drops the below header
@@ -341,7 +331,7 @@ export class LmChatTruefoundry implements INodeType {
             apiKey: credentials.apiKey as string,
             baseURL: credentials.gatewayURL as string,
             // Headers are injected here because LangChain drops some defaultHeaders through to fetch
-            fetch: createGuardrailAwareFetch(tfyMetadata),
+            fetch: createTfyFetch(tfyMetadata),
             defaultHeaders: {
                 'X-TFY-METADATA': JSON.stringify(tfyMetadata),
             },

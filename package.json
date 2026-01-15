@@ -1,5 +1,5 @@
 {
-    "name": "n8n-nodes-tfy-chat",
+    "name": "n8n-nodes-truefoundry",
     "version": "0.1.0",
     "description": "todo",
     "license": "MIT",
@@ -9,11 +9,11 @@
     ],
     "author": {
         "name": "Truefoundry",
-        "email": "todo@truefoundry.com"
+        "email": "abhishek@truefoundry.com"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/truefoundry/n8n-nodes-tfy-chat.git"
+        "url": "https://github.com/truefoundry/n8n-nodes-truefoundry.git"
     },
     "scripts": {
         "build": "n8n-node build",

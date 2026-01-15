@@ -9,17 +9,16 @@ import type {
 export async function searchModels(this: ILoadOptionsFunctions, filter?: string): Promise<INodeListSearchResult> {
     const credentials = await this.getCredentials('truefoundryApi');
 
-    const baseURL = credentials.gatewayURL as string ?? 'https://api.openai.com';
+    const baseURL = credentials.gatewayURL as string ?? 'https://gateway.truefoundry.ai/';
 
     const openai = new OpenAI({
-        baseURL, // TODO: check url
+        baseURL,
         apiKey: credentials.apiKey as string,
     });
 
     const { data: models = [] } = await openai.models.list();
 
     // TODO: check openai node for agent logic
-    // TODO: do we want this logic or just shift to name sorting?
     let results: INodeListSearchItems[] = [];
 
     if (filter) {
