@@ -9,7 +9,7 @@ import type {
 export class TruefoundryApi implements ICredentialType {
 	name = 'truefoundryApi';
 	displayName = 'Truefoundry API';
-	documentationUrl = 'https://docs.n8n.io/integrations/builtin/credentials/openai/'; // TODO: update to truefoundry
+	documentationUrl = 'https://truefoundry.com/docs/ai-gateway/n8n'
 	icon = 'file:../nodes/LmChatTruefoundry/icons/truefoundry.svg' as const;
 	properties: INodeProperties[] = [
 		{
@@ -27,7 +27,7 @@ export class TruefoundryApi implements ICredentialType {
             displayName: 'Gateway URL',
             name: 'gatewayURL',
             type: 'string',
-            default: 'https://truefoundry.com/your-gateway-url',
+            default: 'https://gateway.truefoundry.ai/',
             required: true,
             description: 'The base URL of the AI Gateway',
         },
@@ -45,7 +45,7 @@ export class TruefoundryApi implements ICredentialType {
 
 	test: ICredentialTestRequest = {
         request: {
-            baseURL: '={{$credentials.gatewayURL}}', // TODO: what url is passed to test we are hitting the gateway? 
+            baseURL: '={{$credentials.gatewayURL}}',
             url: '/models', 
             method: 'GET',
         },

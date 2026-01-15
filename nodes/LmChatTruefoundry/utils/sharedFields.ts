@@ -185,5 +185,3 @@ export function getConnectionHintNoticeField(
 		},
 	};
 }
-
-// TODO: remove unused stuff
