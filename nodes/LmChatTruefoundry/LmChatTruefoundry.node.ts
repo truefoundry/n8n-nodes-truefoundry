@@ -32,7 +32,6 @@ export interface AttributionSettings {
 
 export interface TruefoundryMetadata {
     user_id: string;
-    user_id_source: string;
     workflow_id: string;
     workflow_name: string;
     execution_id: string;
@@ -40,6 +39,7 @@ export interface TruefoundryMetadata {
     project_id: string;
     environment: string;
     n8n_app_name: string;
+    instance_id: string;
     cost_center?: string;
 }
 
@@ -55,7 +55,6 @@ export function getTruefoundryMetadata(
     // 2. Fallback Logic
     const fallbackUserEmail = attributionSettings.fallbackUserEmail || '';
     const userId = rawUserId || fallbackUserEmail || 'unknown-user';
-    const userIdSource = rawUserId ? 'n8n-context' : (fallbackUserEmail ? 'fallback-email' : 'unknown');
 
     // 3. Workflow & Execution Data
     const workflow = node.getWorkflow();
@@ -63,6 +62,7 @@ export function getTruefoundryMetadata(
     const workflowName = workflow.name || 'unknown-workflow-name';
     const executionId = node.getExecutionId() || 'unknown-execution';
     const executionMode = node.getMode();
+    const instanceId = node.getInstanceId();
 
     // 4. Attribution Settings
     const department = attributionSettings.department || '';
@@ -73,13 +73,13 @@ export function getTruefoundryMetadata(
     // 5. Construct Metadata Object
     const metadata: TruefoundryMetadata = {
         user_id: String(userId),
-        user_id_source: userIdSource,
         workflow_id: String(workflowId),
         workflow_name: String(workflowName),
         execution_id: String(executionId),
         execution_mode: executionMode,
         project_id: String(projectId),
         environment: environment,
+        instance_id: String(instanceId),
         n8n_app_name: applicationName || 'n8n-ai-agent',
     };
 
