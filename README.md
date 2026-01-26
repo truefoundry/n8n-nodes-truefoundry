@@ -1,46 +1,81 @@
 # n8n-nodes-truefoundry
 
-This is an n8n community node. It lets you use _app/service name_ in your n8n workflows.
-
-_App/service name_ is _one or two sentences describing the service this node integrates with_.
+This is an n8n community node that integrates Truefoundry's LLM chat capabilities with n8n workflows. It provides a LangChain-compatible chat node with built-in metadata tracking for attribution, cost tracking, and monitoring.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation platform.
 
-[Installation](#installation)
-[Operations](#operations)
-[Credentials](#credentials)
-[Compatibility](#compatibility)
-[Usage](#usage)
-[Resources](#resources)
-[Version history](#version-history)
-
 ## Installation
 
-Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
+Install the package from npm:
+
+```bash
+npm install n8n-nodes-truefoundry
+```
+
+Or follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
+
+**NPM Package**: [n8n-nodes-truefoundry](https://www.npmjs.com/package/n8n-nodes-truefoundry)
 
 ## Operations
 
-_List the operations supported by your node._
+- **Chat with LLM**: Interact with OpenAI-compatible language models through Truefoundry
+- **Metadata Tracking**: Automatically tracks workflow execution metadata for attribution and cost monitoring
+- **LangChain Integration**: Compatible with LangChain's ChatOpenAI interface
 
 ## Credentials
 
-_If users need to authenticate with the app/service, provide details here. You should include prerequisites (such as signing up with the service), available authentication methods, and how to set them up._
+This node requires Truefoundry API credentials. For detailed setup instructions, see the [Truefoundry n8n Integration Guide](https://truefoundry.com/docs/ai-gateway/n8n#what-is-n8n).
+
+Quick setup:
+
+1. Sign up for a Truefoundry account
+2. Obtain your API key and base URL from the Truefoundry dashboard
+3. Configure the credentials in n8n:
+   - Go to Credentials → Add Credential
+   - Select "Truefoundry API"
+   - Enter your API key and base URL
+
+## Features
+
+- **Automatic Metadata Injection**: Tracks user ID, workflow ID, execution ID, and more
+- **Cost Attribution**: Supports cost center and department tracking
+- **Environment Management**: Configure different environments (production, staging, etc.)
+- **Fallback User Email**: Set fallback user identification when n8n context is unavailable
 
 ## Compatibility
 
-_State the minimum n8n version, as well as which versions you test against. You can also include any known version incompatibility issues._
+- **Minimum n8n version**: 1.0.0
+- **Node.js version**: 18.x or higher
+- **Tested with**: n8n 1.0+
 
 ## Usage
 
-_This is an optional section. Use it to help users with any difficult or confusing aspects of the node._
+1. Add the "Truefoundry Chat" node to your workflow
+2. Configure your Truefoundry API credentials
+3. Select your model from the available options
+4. Set up your chat prompt and parameters
+5. Configure attribution settings (optional):
+   - Application name
+   - Cost center
+   - Department
+   - Environment
+   - Fallback user email
 
-_By the time users are looking for community nodes, they probably already know n8n basics. But if you expect new users, you can link to the [Try it out](https://docs.n8n.io/try-it-out/) documentation to help them get started._
+The node automatically injects metadata headers for tracking and monitoring purposes.
 
 ## Resources
 
 * [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
-* _Link to app/service documentation._
+* [Truefoundry n8n Integration Guide](https://truefoundry.com/docs/ai-gateway/n8n#what-is-n8n) - Complete setup and configuration guide
+* [Truefoundry Documentation](https://docs.truefoundry.com/)
+* [NPM Package](https://www.npmjs.com/package/n8n-nodes-truefoundry)
+* [GitHub Repository](https://github.com/truefoundry/n8n-nodes-truefoundry)
 
 ## Version history
 
-_This is another optional section. If your node has multiple versions, include a short description of available versions and what changed, as well as any compatibility impact._
+### 0.1.0
+- Initial release
+- LangChain ChatOpenAI integration
+- Automatic metadata tracking
+- Cost attribution support
+- Environment configuration
