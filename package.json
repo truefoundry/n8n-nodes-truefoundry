@@ -49,7 +49,7 @@
         "n8n-workflow": "*"
     },
     "dependencies": {
-        "@langchain/openai": "^0.3.17",
+        "@langchain/openai": "^1.4.4",
         "openai": "^4.104.0"
     }
 }
