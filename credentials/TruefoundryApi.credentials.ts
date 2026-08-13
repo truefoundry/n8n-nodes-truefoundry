@@ -31,6 +31,14 @@ export class TruefoundryApi implements ICredentialType {
             required: true,
             description: 'The base URL of the AI Gateway',
         },
+        {
+            displayName: 'Control Plane URL',
+            name: 'controlPlaneURL',
+            type: 'string',
+            default: '',
+            placeholder: 'https://my-company.truefoundry.cloud',
+            description: 'Your TrueFoundry control plane URL. Optional - only needed to browse prompts from the Prompt Registry using the "From List" option on the Prompt field. If left blank, you can still use a prompt by pasting its FQN directly.',
+        },
 	];
 
 	// Authenticate using Bearer token

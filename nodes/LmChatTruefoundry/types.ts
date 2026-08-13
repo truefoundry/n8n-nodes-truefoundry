@@ -37,15 +37,6 @@ export type ModelOptions = {
 	textFormat?: {
 		textOptions?: TextOptions;
 	};
-	promptConfig?: {
-		promptOptions?: PromptOptions;
-	};
-};
-
-export type PromptOptions = {
-	promptId?: string;
-	version?: string;
-	variables?: string;
 };
 
 export type TextOptions = {

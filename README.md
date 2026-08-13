@@ -41,6 +41,18 @@ Quick setup:
 - **Cost Attribution**: Supports cost center and department tracking
 - **Environment Management**: Configure different environments (production, staging, etc.)
 - **Fallback User Email**: Set fallback user identification when n8n context is unavailable
+- **Prompt Registry**: Bind a saved prompt from Truefoundry's Prompt Registry to the model
+
+## Using the Prompt Registry
+
+You can optionally bind a saved prompt from your Truefoundry [Prompt Registry](https://docs.truefoundry.com/docs/ai-gateway/prompt-management) to the model:
+
+1. In the node's **Prompt** field, either:
+   - Select **From List** to browse and search prompts (requires setting **Control Plane URL** on the credential), or
+   - Select **FQN** and paste the prompt version FQN directly, e.g. `chat_prompt:truefoundry/default/my-prompt:1`
+2. If the prompt has `{{variable}}` placeholders, fill in their values under **Prompt Variables**.
+
+The prompt's messages are sent to the model first, followed by whatever messages the connected AI Agent/Chain sends. Note that the **Model** field always overrides any model configured on the prompt itself.
 
 ## Compatibility
 
