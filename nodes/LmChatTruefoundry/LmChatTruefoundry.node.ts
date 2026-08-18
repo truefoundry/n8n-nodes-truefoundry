@@ -7,6 +7,7 @@ import {
     NodeConnectionTypes,
 } from 'n8n-workflow';
 import { searchModels } from './methods/loadModels';
+import { searchPrompts } from './methods/loadPrompts';
 import { getConnectionHintNoticeField } from './utils/sharedFields';
 // eslint-disable-next-line @n8n/community-nodes/no-restricted-imports
 import { ChatOpenAI } from '@langchain/openai';
@@ -116,7 +117,8 @@ export class LmChatTruefoundry implements INodeType {
 
     methods = {
         listSearch: {
-            searchModels
+            searchModels,
+            searchPrompts,
         },
     };
 
@@ -198,6 +200,62 @@ export class LmChatTruefoundry implements INodeType {
                         name: 'id',
                         type: 'string',
                         placeholder: 'gpt-4o-mini',
+                    },
+                ],
+            },
+            {
+                displayName: 'Prompt',
+                name: 'prompt',
+                type: 'resourceLocator',
+                default: { mode: 'id', value: '' },
+                description: 'Optionally bind a saved prompt from the Truefoundry Prompt Registry. The prompt\'s messages are sent first, followed by the messages from the connected AI Agent/Chain. Note: the Model selected above always overrides the model configured in the prompt.',
+                modes: [
+                    {
+                        displayName: 'From List',
+                        name: 'list',
+                        type: 'list',
+                        typeOptions: {
+                            searchListMethod: 'searchPrompts',
+                            searchable: true,
+                        },
+                    },
+                    {
+                        displayName: 'FQN',
+                        name: 'id',
+                        type: 'string',
+                        placeholder: 'chat_prompt:truefoundry/default/my-prompt:1',
+                    },
+                ],
+            },
+            {
+                displayName: 'Prompt Variables',
+                name: 'promptVariables',
+                type: 'fixedCollection',
+                typeOptions: {
+                    multipleValues: true,
+                },
+                placeholder: 'Add Variable',
+                default: {},
+                description: 'Values for the {{variable}} placeholders defined in the selected prompt',
+                options: [
+                    {
+                        name: 'variables',
+                        displayName: 'Variables',
+                        values: [
+                            {
+                                displayName: 'Name',
+                                name: 'name',
+                                type: 'string',
+                                default: '',
+                                required: true,
+                            },
+                            {
+                                displayName: 'Value',
+                                name: 'value',
+                                type: 'string',
+                                default: '',
+                            },
+                        ],
                     },
                 ],
             },
@@ -322,6 +380,23 @@ export class LmChatTruefoundry implements INodeType {
         const modelName = typeof modelParameter === 'string' ? modelParameter : modelParameter.value;
         const options = this.getNodeParameter('options', itemIndex, {}) as ModelOptions;
 
+        // Prompt Registry: optionally bind a saved prompt (and its variables) to this model
+        const promptParameter = this.getNodeParameter('prompt', itemIndex, { mode: 'id', value: '' }) as
+            | { value: string }
+            | string;
+        const promptFqn = (typeof promptParameter === 'string' ? promptParameter : promptParameter.value)?.trim();
+
+        const promptVariablesParameter = this.getNodeParameter('promptVariables', itemIndex, {}) as {
+            variables?: Array<{ name: string; value: string }>;
+        };
+        const promptVariables = (promptVariablesParameter.variables ?? []).reduce<Record<string, string>>(
+            (acc, { name, value }) => {
+                if (name) acc[name] = value;
+                return acc;
+            },
+            {},
+        );
+
         // truefoundry logic begin
         const attributionSettings = this.getNodeParameter('attributionSettings', itemIndex, {}) as AttributionSettings;
 
@@ -341,6 +416,13 @@ export class LmChatTruefoundry implements INodeType {
         const modelKwargs: Record<string, unknown> = {
             user: `n8n-user-${tfyMetadata.user_id}-workflow-${tfyMetadata.workflow_id}`,
         };
+
+        if (promptFqn) {
+            modelKwargs.prompt_version_fqn = promptFqn;
+            if (Object.keys(promptVariables).length > 0) {
+                modelKwargs.prompt_variables = promptVariables;
+            }
+        }
 
         const model = new ChatOpenAI({
             modelName,
