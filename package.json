@@ -43,6 +43,7 @@
     ],
     "n8n": {
         "n8nNodesApiVersion": 1,
+        "aiNodeSdkVersion": 1,
         "strict": true,
         "credentials": [
             "dist/credentials/TruefoundryApi.credentials.js"
@@ -52,6 +53,7 @@
         ]
     },
     "devDependencies": {
+        "@n8n/ai-node-sdk": "^0.26.5",
         "@n8n/node-cli": "^0.45.5",
         "@types/node": "^25.0.3",
         "eslint": "9.32.0",
@@ -60,10 +62,7 @@
         "typescript": "5.9.2"
     },
     "peerDependencies": {
-        "n8n-workflow": "*"
-    },
-    "dependencies": {
-        "@langchain/openai": "^0.3.17",
-        "openai": "^4.104.0"
+        "n8n-workflow": "*",
+        "@n8n/ai-node-sdk": "*"
     }
 }
