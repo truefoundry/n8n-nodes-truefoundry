@@ -29,14 +29,11 @@ export async function searchPrompts(this: ILoadOptionsFunctions, filter?: string
 
     const baseURL = controlPlaneURL.replace(/\/$/, '');
 
-    const response = (await this.helpers.httpRequest({
+    const response = (await this.helpers.httpRequestWithAuthentication.call(this, 'truefoundryApi', {
         method: 'GET',
         url: `${baseURL}/api/svc/v1/prompt-versions`,
         qs: {
             limit: 100,
-        },
-        headers: {
-            Authorization: `Bearer ${credentials.apiKey as string}`,
         },
         json: true,
     })) as ListPromptVersionsResponse;

@@ -1,22 +1,3 @@
-// eslint-disable-next-line @n8n/community-nodes/no-restricted-imports
-import type { OpenAIClient } from '@langchain/openai';
-
-export type BuiltInTools = {
-	webSearch?: {
-		searchContextSize?: 'low' | 'medium' | 'high';
-		allowedDomains?: string;
-		country?: string;
-		city?: string;
-		region?: string;
-	};
-	fileSearch?: {
-		vectorStoreIds?: string;
-		filters?: string;
-		maxResults?: number;
-	};
-	codeInterpreter?: boolean;
-};
-
 export type ModelOptions = {
 	baseURL?: string;
 	frequencyPenalty?: number;
@@ -46,8 +27,4 @@ export type TextOptions = {
 	schema?: string;
 	description?: string;
 	strict?: boolean;
-};
-export type ChatResponseRequest = OpenAIClient.Responses.ResponseCreateParamsNonStreaming & {
-	conversation?: { id: string } | string;
-	top_logprobs?: number;
 };

@@ -9,10 +9,7 @@ import {
 import { searchModels } from './methods/loadModels';
 import { searchPrompts } from './methods/loadPrompts';
 import { getConnectionHintNoticeField } from './utils/sharedFields';
-// eslint-disable-next-line @n8n/community-nodes/no-restricted-imports
-import { ChatOpenAI } from '@langchain/openai';
-// eslint-disable-next-line @n8n/community-nodes/no-restricted-imports
-import type { ClientOptions } from 'openai';
+import { supplyModel } from '@n8n/ai-node-sdk';
 import { ModelOptions } from './types';
 
 const INCLUDE_JSON_WARNING: INodeProperties = {
@@ -95,24 +92,6 @@ export function getTruefoundryMetadata(
     return metadata;
 }
 
-function createTfyFetch(tfyMetadata: TruefoundryMetadata): typeof fetch {
-    return async(input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-
-        // Truefoundry logic: inject metadata headers, a failsafe in case langchain drops the below header
-        const headers = new Headers(init?.headers);
-        headers.set('X-TFY-METADATA', JSON.stringify(tfyMetadata));
-
-        const newInit = {
-            ...init,
-            headers,
-        }
-
-        const response = await fetch(input, newInit);
-
-        return response;
-    }
-}
-
 export class LmChatTruefoundry implements INodeType {
 
     methods = {
@@ -122,11 +101,14 @@ export class LmChatTruefoundry implements INodeType {
         },
     };
 
-    description: INodeTypeDescription = {
-        usableAsTool: true, // to avoid linting error
+        description: INodeTypeDescription = {
         displayName: 'Truefoundry Chat Model', 
         name: 'lmChatTruefoundry', 
-        icon: 'file:icons/truefoundry.svg', 
+        icon: {
+            light: 'file:icons/truefoundry.svg',
+            dark: 'file:icons/truefoundry.dark.svg',
+        },
+        subtitle: '={{$parameter["model"]}}',
         group: ['transform'],
         version: 1,
         description: 'Truefoundry Chat Model with automatic user attribution', 
@@ -402,31 +384,26 @@ export class LmChatTruefoundry implements INodeType {
 
         const tfyMetadata = getTruefoundryMetadata(this, attributionSettings);
 
-        const configuration: ClientOptions = {
+        const additionalParams: Record<string, unknown> = {};
+
+        if (promptFqn) {
+            additionalParams.prompt_version_fqn = promptFqn;
+            if (Object.keys(promptVariables).length > 0) {
+                additionalParams.prompt_variables = promptVariables;
+            }
+        }
+        // truefoundry logic end
+
+        return supplyModel(this, {
+            type: 'openai',
+            baseUrl: credentials.gatewayURL as string,
             apiKey: credentials.apiKey as string,
-            baseURL: credentials.gatewayURL as string,
-            // Headers are injected here because LangChain drops some defaultHeaders through to fetch
-            fetch: createTfyFetch(tfyMetadata),
+            model: modelName,
+            user: `n8n-user-${tfyMetadata.user_id}-workflow-${tfyMetadata.workflow_id}`,
             defaultHeaders: {
                 'X-TFY-METADATA': JSON.stringify(tfyMetadata),
             },
-        };
-        // truefoundry logic end
-
-        const modelKwargs: Record<string, unknown> = {
-            user: `n8n-user-${tfyMetadata.user_id}-workflow-${tfyMetadata.workflow_id}`,
-        };
-
-        if (promptFqn) {
-            modelKwargs.prompt_version_fqn = promptFqn;
-            if (Object.keys(promptVariables).length > 0) {
-                modelKwargs.prompt_variables = promptVariables;
-            }
-        }
-
-        const model = new ChatOpenAI({
-            modelName,
-            apiKey: credentials.apiKey as string,
+            additionalParams,
             maxTokens: options.maxTokens && options.maxTokens > 0 ? options.maxTokens : undefined,
             temperature: options.temperature,
             topP: options.topP,
@@ -434,13 +411,7 @@ export class LmChatTruefoundry implements INodeType {
             presencePenalty: options.presencePenalty,
             timeout: options.timeout || 60000,
             maxRetries: options.maxRetries || 2,
-            configuration,
-            modelKwargs,
         });
-
-        return {
-            response: model,
-        };
     }
 }
 

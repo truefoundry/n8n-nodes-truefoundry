@@ -1,22 +1,30 @@
-// eslint-disable-next-line @n8n/community-nodes/no-restricted-imports
-import { OpenAI } from 'openai';
 import type {
     ILoadOptionsFunctions,
     INodeListSearchItems,
     INodeListSearchResult,
 } from 'n8n-workflow';
 
+interface GatewayModel {
+    id: string;
+    created: number;
+}
+
+interface ListModelsResponse {
+    data?: GatewayModel[];
+}
+
 export async function searchModels(this: ILoadOptionsFunctions, filter?: string): Promise<INodeListSearchResult> {
     const credentials = await this.getCredentials('truefoundryApi');
 
-    const baseURL = credentials.gatewayURL as string ?? 'https://gateway.truefoundry.ai/';
+    const baseURL = ((credentials.gatewayURL as string) || 'https://gateway.truefoundry.ai/').replace(/\/$/, '');
 
-    const openai = new OpenAI({
-        baseURL,
-        apiKey: credentials.apiKey as string,
-    });
+    const response = (await this.helpers.httpRequestWithAuthentication.call(this, 'truefoundryApi', {
+        method: 'GET',
+        url: `${baseURL}/models`,
+        json: true,
+    })) as ListModelsResponse;
 
-    const { data: models = [] } = await openai.models.list();
+    const models = response.data ?? [];
 
     // TODO: check openai node for agent logic
     let results: INodeListSearchItems[] = [];
