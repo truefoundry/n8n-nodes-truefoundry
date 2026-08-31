@@ -1,14 +1,28 @@
 {
     "name": "n8n-nodes-truefoundry",
     "version": "0.1.0",
-    "description": "todo",
+    "description": "n8n community node providing a TrueFoundry AI Gateway chat model for AI Agents — one OpenAI-compatible API to 1000+ LLMs with governance and cost tracking.",
     "license": "MIT",
-    "homepage": "",
+    "homepage": "https://www.truefoundry.com/docs/ai-gateway/n8n",
     "keywords": [
-        "n8n-community-node-package"
+        "n8n-community-node-package",
+        "n8n",
+        "n8n-nodes",
+        "truefoundry",
+        "ai-gateway",
+        "llm-gateway",
+        "chat-model",
+        "llm",
+        "ai",
+        "ai-agent",
+        "langchain",
+        "openai-compatible",
+        "llmops",
+        "model-routing",
+        "llm-observability"
     ],
     "author": {
-        "name": "Truefoundry",
+        "name": "TrueFoundry",
         "email": "abhishek@truefoundry.com"
     },
     "repository": {
@@ -38,7 +52,7 @@
         ]
     },
     "devDependencies": {
-        "@n8n/node-cli": "*",
+        "@n8n/node-cli": "^0.45.5",
         "@types/node": "^25.0.3",
         "eslint": "9.32.0",
         "prettier": "3.6.2",
